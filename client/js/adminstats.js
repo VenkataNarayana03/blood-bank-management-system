@@ -22,10 +22,10 @@ window.onload = async function () {
     const data = await res.json();
     console.log("📊 Fetched stats data:", data);
 
-    // Update the dashboard counts
-    document.getElementById("donors").textContent = data.donors || 0;
-    document.getElementById("recipients").textContent = data.recipients || 0;
-    document.getElementById("requests").textContent = data.requests || 0;
+    // Safely update the dashboard counts
+    document.getElementById("donors").textContent = data.donors ?? 0;
+    document.getElementById("recipients").textContent = data.recipients ?? 0;
+    document.getElementById("requests").textContent = data.requests ?? 0;
 
   } catch (err) {
     console.error("❌ Error loading dashboard data:", err.message);
