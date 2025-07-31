@@ -152,9 +152,24 @@
   <script>
     let allUsers = [];
 
+    function showLoading() {
+      document.querySelector("#usersTable tbody").innerHTML =
+        "<tr><td colspan='4'>Loading users...</td></tr>";
+    }
+
     async function fetchUsers() {
+      const token = localStorage.getItem("token");
+      showLoading();
+
       try {
-        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/admin/users");
+        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/admin/users", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch users");
+
         const users = await res.json();
         allUsers = users;
         renderTable(allUsers);
@@ -198,17 +213,20 @@
     }
 
     async function deleteUser(email) {
+      const token = localStorage.getItem("token");
       if (!confirm(`Are you sure you want to delete user ${email}?`)) return;
 
-      
       try {
-        const res = await fetch(`https://blood-bank-management-system-p5yt.onrender.com/admin/users/${email}`, {
-          method: "DELETE"
+        const res = await fetch(`https://blood-bank-management-system-p5yt.onrender.com/api/admin/users/${email}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
 
         if (res.ok) {
           alert("User deleted successfully.");
-          fetchUsers(); // Refresh the list
+          fetchUsers(); // Refresh
         } else {
           const { message } = await res.json();
           alert("Error deleting user: " + message);
