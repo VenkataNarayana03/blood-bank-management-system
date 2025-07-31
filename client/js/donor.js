@@ -19,7 +19,7 @@ if (document.getElementById("profileForm")) {
     const contact = document.getElementById("contact").value;
 
     try {
-      const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donor/profil", {
+      const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donor/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
