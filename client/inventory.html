@@ -248,7 +248,7 @@
       }
 
       try {
-        const res = await fetch("http://localhost:5050/api/inventory", {
+        const res = await fetch(" https://blood-bank-management-system-p5yt.onrender.com/api/inventory", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ hospital, location, bloodGroup, units }),
@@ -272,7 +272,7 @@
       if (!confirm("Are you sure you want to delete this entry?")) return;
 
       try {
-        const res = await fetch(`http://localhost:5050/api/inventory/${id}`, {
+        const res = await fetch(` https://blood-bank-management-system-p5yt.onrender.com/api/inventory/${id}`, {
           method: "DELETE",
         });
 
