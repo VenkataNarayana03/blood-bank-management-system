@@ -5,7 +5,7 @@ window.onload = async function () {
     const token = localStorage.getItem("token");
     console.log("🔐 Loaded token:", token);
 
-    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/stats", {
+    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/adminstats", {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,
