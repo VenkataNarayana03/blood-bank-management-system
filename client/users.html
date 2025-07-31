@@ -154,7 +154,7 @@
 
     async function fetchUsers() {
       try {
-        const res = await fetch("http://localhost:5050/api/admin/users");
+        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/admin/users");
         const users = await res.json();
         allUsers = users;
         renderTable(allUsers);
