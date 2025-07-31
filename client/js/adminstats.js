@@ -3,7 +3,7 @@ console.log("✅ adminstats.js loaded");
 window.onload = async function () {
 
   try {
-    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com");
+    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/adminstats");
 
     if (!res.ok) throw new Error("Failed to fetch dashboard stats");
 
