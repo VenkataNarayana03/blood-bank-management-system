@@ -1,5 +1,5 @@
 // ✅ Set correct base URL
-const API = 'https://blood-bank-management-system-p5yt.onrender.com';
+const API = 'https://blood-bank-management-system-p5yt.onrender.com/api';
 
 // 🔐 REGISTER
 if (document.getElementById('registerForm')) {
