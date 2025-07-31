@@ -46,7 +46,25 @@ if (document.getElementById("donateForm")) {
     const location = document.getElementById("location").value;
 
     try {
-      const res = await fetch("http://localhost:5050/api/donor/donate", {
+      const res = await fetch("console.log("✅ adminstats.js loaded");
+
+window.onload = async function () {
+
+  try {
+    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/adminstats");
+
+    if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+
+    const data = await res.json();
+
+    document.getElementById("donors").textContent = data.donors || 0;
+    document.getElementById("recipients").textContent = data.recipients || 0;
+    document.getElementById("requests").textContent = data.requests || 0;
+  } catch (err) {
+    console.error("❌ Error loading dashboard data:", err.message);
+    alert("Failed to load admin stats.");
+  }
+};/api/donor/donate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +84,25 @@ if (document.getElementById("donateForm")) {
 
 // -------------------- View Donation History --------------------
 if (document.getElementById("donationTable")) {
-  fetch(`http://localhost:5050/api/donor/history?email=${user.email}`, {
+  fetch(`console.log("✅ adminstats.js loaded");
+
+window.onload = async function () {
+
+  try {
+    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/adminstats");
+
+    if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+
+    const data = await res.json();
+
+    document.getElementById("donors").textContent = data.donors || 0;
+    document.getElementById("recipients").textContent = data.recipients || 0;
+    document.getElementById("requests").textContent = data.requests || 0;
+  } catch (err) {
+    console.error("❌ Error loading dashboard data:", err.message);
+    alert("Failed to load admin stats.");
+  }
+};/donor/history?email=${user.email}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
