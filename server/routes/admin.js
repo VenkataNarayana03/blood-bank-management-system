@@ -140,7 +140,7 @@ router.get('/users', async (req, res) => {
   }
 });
 
-router.get('/stats', async (req, res) => {
+router.get('/adminstats', async (req, res) => {
   try {
     const totalDonors = await User.countDocuments({ role: 'donor' });
     const totalRecipients = await User.countDocuments({ role: 'recipient' });
