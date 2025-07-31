@@ -116,19 +116,24 @@ router.put('/requests/:id', async (req, res) => {
   }
 });
 
-// ✅ DELETE request by ID (preserved from original)
-router.delete('/requests/:id', async (req, res) => {
+// ✅ DELETE user by email
+router.delete('/users/:email', async (req, res) => {
+  const { email } = req.params;
+
   try {
-    const deleted = await BloodRequest.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: 'Request not found' });
+    const deletedUser = await User.findOneAndDelete({ email });
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ message: 'Request deleted successfully' });
+
+    res.json({ message: 'User deleted successfully' });
   } catch (err) {
-    console.error('❌ Delete request error:', err.message);
-    res.status(500).json({ error: 'Server error' });
+    console.error('❌ Error deleting user:', err.message);
+    res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 // ✅ GET all users
 router.get('/users', async (req, res) => {
