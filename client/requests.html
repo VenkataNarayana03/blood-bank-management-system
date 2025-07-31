@@ -139,108 +139,77 @@
   <footer>© 2025 Blood Bank Management | Admin Panel</footer>
 
   <script>
-    async function fetchRequests() {
-      try {
-        const res = await fetch('console.log("✅ adminstats.js loaded");
+  const BASE_URL = "https://blood-bank-management-system-p5yt.onrender.com";
 
-window.onload = async function () {
+  async function fetchRequests() {
+    try {
+      const res = await fetch(`${BASE_URL}/api/admin/requests`);
+      if (!res.ok) throw new Error("Failed to fetch requests");
 
-  try {
-    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/adminstats");
+      const data = await res.json();
 
-    if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+      const tbody = document.querySelector("#requestsTable tbody");
+      tbody.innerHTML = "";
 
-    const data = await res.json();
-
-    document.getElementById("donors").textContent = data.donors || 0;
-    document.getElementById("recipients").textContent = data.recipients || 0;
-    document.getElementById("requests").textContent = data.requests || 0;
-  } catch (err) {
-    console.error("❌ Error loading dashboard data:", err.message);
-    alert("Failed to load admin stats.");
-  }
-};/api/admin/requests');
-        const data = await res.json();
-
-        const tbody = document.querySelector("#requestsTable tbody");
-        tbody.innerHTML = "";
-
-        data.forEach(request => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${request.email}</td>
-            <td>${request.bloodGroup}</td>
-            <td>${request.location}</td>
-            <td>${request.reason}</td>
-            <td>${new Date(request.date).toLocaleDateString()}</td>
-            <td><span class="status ${request.status}">${request.status}</span></td>
-            <td>
-              <button class="approve-btn" onclick="updateStatus('${request._id}', 'Approved')">Approve</button>
-              <button class="deny-btn" onclick="updateStatus('${request._id}', 'Denied')">Deny</button>
-              <button class="delete-btn" onclick="deleteRequest('${request._id}')">Delete</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-      } catch (err) {
-        console.error("Failed to fetch requests:", err);
-      }
+      data.forEach(request => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${request.email}</td>
+          <td>${request.bloodGroup}</td>
+          <td>${request.location}</td>
+          <td>${request.reason}</td>
+          <td>${new Date(request.date).toLocaleDateString()}</td>
+          <td><span class="status ${request.status}">${request.status}</span></td>
+          <td>
+            <button class="approve-btn" onclick="updateStatus('${request._id}', 'Approved')">Approve</button>
+            <button class="deny-btn" onclick="updateStatus('${request._id}', 'Denied')">Deny</button>
+            <button class="delete-btn" onclick="deleteRequest('${request._id}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Failed to fetch requests:", err);
+      alert("Error loading requests.");
     }
-
-    async function updateStatus(id, status) {
-      try {
-        const res = await fetch(`console.log("✅ adminstats.js loaded");
-
-window.onload = async function () {
-
-  try {
-    const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/adminstats");
-
-    if (!res.ok) throw new Error("Failed to fetch dashboard stats");
-
-    const data = await res.json();
-
-    document.getElementById("donors").textContent = data.donors || 0;
-    document.getElementById("recipients").textContent = data.recipients || 0;
-    document.getElementById("requests").textContent = data.requests || 0;
-  } catch (err) {
-    console.error("❌ Error loading dashboard data:", err.message);
-    alert("Failed to load admin stats.");
   }
-};/api/admin/requests/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status })
-        });
 
-        const result = await res.json();
-        alert(result.message || "Status updated.");
-        fetchRequests(); // refresh list
-      } catch (err) {
-        console.error("Failed to update status:", err);
-        alert("Error updating request status.");
-      }
+  async function updateStatus(id, status) {
+    try {
+      const res = await fetch(`${BASE_URL}/api/admin/requests/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+
+      const result = await res.json();
+      alert(result.message || "Status updated.");
+      fetchRequests(); // refresh list
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      alert("Error updating request status.");
     }
-
-    async function deleteRequest(id) {
-  if (!confirm("Are you sure you want to delete this request permanently?")) return;
-
-  try {
-    const res = await fetch(`https://blood-bank-management-system-p5yt.onrender.com/api/admin/requests/${id}`, {
-      method: "DELETE"
-    });
-
-    const result = await res.json();
-    alert(result.message || result.error || "Request deleted.");
-    fetchRequests(); // refresh list
-  } catch (err) {
-    console.error("Failed to delete request:", err);
-    alert("Error deleting request.");
   }
-}
 
-    // Load on page load
-    fetchRequests();
-  </script>
+  async function deleteRequest(id) {
+    if (!confirm("Are you sure you want to delete this request permanently?")) return;
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/admin/requests/${id}`, {
+        method: "DELETE"
+      });
+
+      const result = await res.json();
+      alert(result.message || result.error || "Request deleted.");
+      fetchRequests(); // refresh list
+    } catch (err) {
+      console.error("Failed to delete request:", err);
+      alert("Error deleting request.");
+    }
+  }
+
+  // Load requests when the page loads
+  window.onload = fetchRequests;
+</script>
 </body>
 </html>
