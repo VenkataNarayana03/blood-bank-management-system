@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateForm.onsubmit = async (e) => {
       e.preventDefault();
       const user = JSON.parse(localStorage.getItem("user"));
-      const res = await fetch("http://localhost:5050/api/donor/profile", {
+      const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donor/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
