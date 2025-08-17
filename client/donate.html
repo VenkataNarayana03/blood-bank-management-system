@@ -36,7 +36,7 @@
       flex-direction: column;
     }
 
-    input, button {
+    input, select, button {
       padding: 12px;
       margin: 10px 0;
       border-radius: 8px;
@@ -113,6 +113,17 @@
     <h2>Donate Blood</h2>
     <form id="donateForm">
       <input type="email" id="email" placeholder="Your Email" required />
+      <select id="bloodType" required>
+        <option value="">Select Blood Type</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+      </select>
       <input type="date" id="date" required />
       <input type="text" id="location" placeholder="Donation Location" required />
       <button type="submit">Schedule Donation</button>
@@ -139,6 +150,7 @@
       e.preventDefault();
 
       const email = document.getElementById("email").value.trim();
+      const bloodType = document.getElementById("bloodType").value;
       const date = document.getElementById("date").value;
       const location = document.getElementById("location").value.trim();
 
@@ -146,7 +158,7 @@
         const res = await fetch(`${API_BASE}/donate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, date, location })
+          body: JSON.stringify({ email, bloodType, date, location })
         });
 
         const result = await res.json();
@@ -155,7 +167,7 @@
 
         if (res.ok) {
           // Save last donation in localStorage
-          localStorage.setItem("lastDonation", JSON.stringify({ email, date, location }));
+          localStorage.setItem("lastDonation", JSON.stringify({ email, bloodType, date, location }));
           e.target.reset();
         }
       } catch (err) {
@@ -175,6 +187,7 @@
       if (lastDonation) {
         lastDonationData.innerHTML = `
           <p><strong>Email:</strong> ${lastDonation.email}</p>
+          <p><strong>Blood Type:</strong> ${lastDonation.bloodType}</p>
           <p><strong>Date:</strong> ${new Date(lastDonation.date).toLocaleDateString()}</p>
           <p><strong>Location:</strong> ${lastDonation.location}</p>
         `;
