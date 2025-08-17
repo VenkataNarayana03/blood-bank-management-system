@@ -44,6 +44,10 @@
       font-size: 16px;
     }
 
+    select {
+      background: #f9f9f9;
+    }
+
     button {
       background: #b71c1c;
       color: white;
@@ -68,7 +72,11 @@
       color: #999;
     }
 
-    /* Modal */
+    #customHospital {
+      display: none;
+    }
+
+    /* --- Modal Styles --- */
     .modal {
       display: none;
       position: fixed;
@@ -112,21 +120,34 @@
   <div class="container">
     <h2>Donate Blood</h2>
     <form id="donateForm">
-      <input type="email" id="email" placeholder="Your Email" required />
-      <select id="bloodType" required>
-        <option value="">Select Blood Type</option>
+      <select id="hospitalSelect" required>
+        <option value="" disabled selected>Select Hospital</option>
+        <option value="Apollo Hospitals">Apollo Hospitals</option>
+        <option value="Fortis Healthcare">Fortis Healthcare</option>
+        <option value="AIIMS Delhi">AIIMS Delhi</option>
+        <option value="Manipal Hospital">Manipal Hospital</option>
+        <option value="Global Hospitals">Global Hospitals</option>
+        <option value="CMC Vellore">CMC Vellore</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="text" id="customHospital" placeholder="Enter Hospital Name" />
+
+      <input type="text" id="location" placeholder="Location" required />
+
+      <select id="bloodGroup" required>
+        <option value="" disabled selected>Select Blood Group</option>
         <option value="A+">A+</option>
         <option value="A-">A-</option>
         <option value="B+">B+</option>
         <option value="B-">B-</option>
-        <option value="O+">O+</option>
-        <option value="O-">O-</option>
         <option value="AB+">AB+</option>
         <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
       </select>
-      <input type="date" id="date" required />
-      <input type="text" id="location" placeholder="Donation Location" required />
-      <button type="submit">Schedule Donation</button>
+
+      <input type="number" id="units" placeholder="1Unit=450ml" min="1" required />
+      <button type="submit">Donate</button>
       <button type="button" id="seeLastDonation">See Last Donation</button>
       <div id="message"></div>
     </form>
@@ -143,33 +164,58 @@
   </div>
 
   <script>
-    const API_BASE = "https://blood-bank-management-system-p5yt.onrender.com/api/donor";
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-    // Handle form submit
+    const hospitalSelect = document.getElementById("hospitalSelect");
+    const customHospitalInput = document.getElementById("customHospital");
+
+    hospitalSelect.addEventListener("change", () => {
+      if (hospitalSelect.value === "Other") {
+        customHospitalInput.style.display = "block";
+        customHospitalInput.required = true;
+      } else {
+        customHospitalInput.style.display = "none";
+        customHospitalInput.required = false;
+      }
+    });
+
+    // Save donation form data
     document.getElementById("donateForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById("email").value.trim();
-      const bloodType = document.getElementById("bloodType").value;
-      const date = document.getElementById("date").value;
-      const location = document.getElementById("location").value.trim();
+      const hospital = hospitalSelect.value === "Other" ? customHospitalInput.value : hospitalSelect.value;
+      const location = document.getElementById("location").value;
+      const bloodGroup = document.getElementById("bloodGroup").value;
+      const units = document.getElementById("units").value;
 
       try {
-        const res = await fetch(`${API_BASE}/donate`, {
+        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donate", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, bloodType, date, location })
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            hospital,
+            location,
+            bloodGroup,
+            units,
+            donorEmail: user.email
+          })
         });
 
         const result = await res.json();
         document.getElementById("message").innerText = result.message || "Donation submitted!";
-        document.getElementById("message").style.color = res.ok ? "green" : "red";
+        document.getElementById("message").style.color = "green";
 
-        if (res.ok) {
-          // Save last donation in localStorage
-          localStorage.setItem("lastDonation", JSON.stringify({ email, bloodType, date, location }));
-          e.target.reset();
-        }
+        // Save last donation in localStorage
+        localStorage.setItem("lastDonation", JSON.stringify({
+          hospital, location, bloodGroup, units, date: new Date().toLocaleString()
+        }));
+
+        e.target.reset();
+        customHospitalInput.style.display = "none";
       } catch (err) {
         document.getElementById("message").innerText = "Something went wrong.";
         document.getElementById("message").style.color = "red";
@@ -186,10 +232,11 @@
       const lastDonation = JSON.parse(localStorage.getItem("lastDonation"));
       if (lastDonation) {
         lastDonationData.innerHTML = `
-          <p><strong>Email:</strong> ${lastDonation.email}</p>
-          <p><strong>Blood Type:</strong> ${lastDonation.bloodType}</p>
-          <p><strong>Date:</strong> ${new Date(lastDonation.date).toLocaleDateString()}</p>
+          <p><strong>Hospital:</strong> ${lastDonation.hospital}</p>
           <p><strong>Location:</strong> ${lastDonation.location}</p>
+          <p><strong>Blood Group:</strong> ${lastDonation.bloodGroup}</p>
+          <p><strong>Units:</strong> ${lastDonation.units}</p>
+          <p><strong>Date:</strong> ${lastDonation.date}</p>
         `;
       } else {
         lastDonationData.innerText = "No previous donation found.";
@@ -209,3 +256,5 @@
   </script>
 </body>
 </html>
+
+i have used local system storage for history can you do it wirtrh apis calling
