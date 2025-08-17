@@ -146,7 +146,7 @@
         <option value="O-">O-</option>
       </select>
 
-      <input type="number" id="units" placeholder="1Unit=450ml" min="1" required />
+      <input type="number" id="units" placeholder="1 Unit = 450ml" min="1" required />
       <button type="submit">Donate</button>
       <button type="button" id="seeLastDonation">See Last Donation</button>
       <div id="message"></div>
@@ -164,11 +164,10 @@
   </div>
 
   <script>
-    const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
-
     const hospitalSelect = document.getElementById("hospitalSelect");
     const customHospitalInput = document.getElementById("customHospital");
+
+    let donationHistory = [];
 
     hospitalSelect.addEventListener("change", () => {
       if (hospitalSelect.value === "Other") {
@@ -180,8 +179,7 @@
       }
     });
 
-    // Save donation form data
-    document.getElementById("donateForm").addEventListener("submit", async (e) => {
+    document.getElementById("donateForm").addEventListener("submit", (e) => {
       e.preventDefault();
 
       const hospital = hospitalSelect.value === "Other" ? customHospitalInput.value : hospitalSelect.value;
@@ -189,37 +187,20 @@
       const bloodGroup = document.getElementById("bloodGroup").value;
       const units = document.getElementById("units").value;
 
-      try {
-        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            hospital,
-            location,
-            bloodGroup,
-            units,
-            donorEmail: user.email
-          })
-        });
+      // Store latest donation (delete old)
+      donationHistory = [{
+        hospital,
+        location,
+        bloodGroup,
+        units,
+        date: new Date().toLocaleString()
+      }];
 
-        const result = await res.json();
-        document.getElementById("message").innerText = result.message || "Donation submitted!";
-        document.getElementById("message").style.color = "green";
+      document.getElementById("message").innerText = "Donation submitted!";
+      document.getElementById("message").style.color = "green";
 
-        // Save last donation in localStorage
-        localStorage.setItem("lastDonation", JSON.stringify({
-          hospital, location, bloodGroup, units, date: new Date().toLocaleString()
-        }));
-
-        e.target.reset();
-        customHospitalInput.style.display = "none";
-      } catch (err) {
-        document.getElementById("message").innerText = "Something went wrong.";
-        document.getElementById("message").style.color = "red";
-      }
+      e.target.reset();
+      customHospitalInput.style.display = "none";
     });
 
     // Modal logic
@@ -229,14 +210,14 @@
     const lastDonationData = document.getElementById("lastDonationData");
 
     seeLastDonation.addEventListener("click", () => {
-      const lastDonation = JSON.parse(localStorage.getItem("lastDonation"));
-      if (lastDonation) {
+      if (donationHistory.length > 0) {
+        const donation = donationHistory[0]; // latest
         lastDonationData.innerHTML = `
-          <p><strong>Hospital:</strong> ${lastDonation.hospital}</p>
-          <p><strong>Location:</strong> ${lastDonation.location}</p>
-          <p><strong>Blood Group:</strong> ${lastDonation.bloodGroup}</p>
-          <p><strong>Units:</strong> ${lastDonation.units}</p>
-          <p><strong>Date:</strong> ${lastDonation.date}</p>
+          <p><strong>Hospital:</strong> ${donation.hospital}</p>
+          <p><strong>Location:</strong> ${donation.location}</p>
+          <p><strong>Blood Group:</strong> ${donation.bloodGroup}</p>
+          <p><strong>Units:</strong> ${donation.units}</p>
+          <p><strong>Date:</strong> ${donation.date}</p>
         `;
       } else {
         lastDonationData.innerText = "No previous donation found.";
