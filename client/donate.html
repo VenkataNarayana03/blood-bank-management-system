@@ -1,102 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Donate Blood</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
       margin: 0;
       padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #ffe0e0, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(233, 30, 99, 0.3);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h2 {
+      color: #b71c1c;
+      margin-bottom: 10px;
+    }
+
+    form {
       display: flex;
       flex-direction: column;
-      align-items: center;
     }
-    h2 {
-      margin-top: 20px;
-      color: #c62828;
-    }
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      width: 320px;
-      margin-top: 10px;
-    }
+
     input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #b71;
+      font-size: 16px;
     }
+
     button {
-      background: #c62828;
-      color: #fff;
+      background: #b71c1c;
+      color: white;
+      font-weight: bold;
       border: none;
       cursor: pointer;
+      transition: 0.3s;
     }
+
     button:hover {
-      background: #a61c1c;
+      background: linear-gradient(to right, #ad1457, #ec407a);
     }
+
     #message {
       margin-top: 10px;
       font-weight: bold;
     }
-    #history {
+
+    footer {
       margin-top: 20px;
-      width: 90%;
-      max-width: 600px;
+      font-size: 0.9em;
+      color: #999;
     }
-    table {
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
     }
-    table, th, td {
-      border: 1px solid #ddd;
+
+    .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      text-align: left;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
-    th, td {
-      padding: 8px;
-      text-align: center;
+
+    .modal h3 {
+      margin-top: 0;
+      color: #b71c1c;
     }
-    th {
-      background: #f2f2f2;
+
+    .close {
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+      color: #555;
+    }
+    .close:hover {
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <h2>Schedule Blood Donation</h2>
+  <div class="container">
+    <h2>Donate Blood</h2>
+    <form id="donateForm">
+      <input type="email" id="email" placeholder="Your Email" required />
+      <input type="date" id="date" required />
+      <input type="text" id="location" placeholder="Donation Location" required />
+      <button type="submit">Schedule Donation</button>
+      <button type="button" id="seeLastDonation">See Last Donation</button>
+      <div id="message"></div>
+    </form>
+    <footer>© 2025 Blood Bank | Venkata Narayana Mogili</footer>
+  </div>
 
-  <form id="donateForm">
-    <input type="email" id="email" placeholder="Your Email" required>
-    <input type="date" id="date" required>
-    <input type="text" id="location" placeholder="Donation Location" required>
-    <button type="submit">Submit Donation</button>
-  </form>
-
-  <p id="message"></p>
-
-  <div id="history">
-    <h3>Your Donation History</h3>
-    <table id="historyTable">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Location</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- Modal -->
+  <div id="donationModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3>Last Donation Details</h3>
+      <div id="lastDonationData">No previous donation found.</div>
+    </div>
   </div>
 
   <script>
     const API_BASE = "https://blood-bank-management-system-p5yt.onrender.com/api/donor";
 
-    // Handle donation form submit
+    // Handle form submit
     document.getElementById("donateForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -111,44 +149,50 @@
           body: JSON.stringify({ email, date, location })
         });
 
-        const data = await res.json();
-        document.getElementById("message").innerText = data.message;
+        const result = await res.json();
+        document.getElementById("message").innerText = result.message || "Donation submitted!";
+        document.getElementById("message").style.color = res.ok ? "green" : "red";
 
         if (res.ok) {
-          loadHistory(email); // refresh donation history
+          // Save last donation in localStorage
+          localStorage.setItem("lastDonation", JSON.stringify({ email, date, location }));
+          e.target.reset();
         }
       } catch (err) {
-        document.getElementById("message").innerText = "❌ Error: " + err.message;
+        document.getElementById("message").innerText = "Something went wrong.";
+        document.getElementById("message").style.color = "red";
       }
     });
 
-    // Fetch and display donation history
-    async function loadHistory(email) {
-      try {
-        const res = await fetch(`${API_BASE}/history/${email}`);
-        const data = await res.json();
+    // Modal logic
+    const modal = document.getElementById("donationModal");
+    const closeModal = document.getElementById("closeModal");
+    const seeLastDonation = document.getElementById("seeLastDonation");
+    const lastDonationData = document.getElementById("lastDonationData");
 
-        const tbody = document.querySelector("#historyTable tbody");
-        tbody.innerHTML = "";
-
-        if (res.ok && data.length > 0) {
-          data.forEach(donation => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${new Date(donation.date).toLocaleDateString()}</td>
-              <td>${donation.location}</td>
-            `;
-            tbody.appendChild(tr);
-          });
-        } else {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td colspan="2">No donations found</td>`;
-          tbody.appendChild(tr);
-        }
-      } catch (err) {
-        console.error("Error loading history:", err);
+    seeLastDonation.addEventListener("click", () => {
+      const lastDonation = JSON.parse(localStorage.getItem("lastDonation"));
+      if (lastDonation) {
+        lastDonationData.innerHTML = `
+          <p><strong>Email:</strong> ${lastDonation.email}</p>
+          <p><strong>Date:</strong> ${new Date(lastDonation.date).toLocaleDateString()}</p>
+          <p><strong>Location:</strong> ${lastDonation.location}</p>
+        `;
+      } else {
+        lastDonationData.innerText = "No previous donation found.";
       }
-    }
+      modal.style.display = "flex";
+    });
+
+    closeModal.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
+    });
   </script>
 </body>
 </html>
