@@ -180,7 +180,7 @@
       }
     });
 
-    // Save donation form data
+    // Save donation via API
     document.getElementById("donateForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -190,29 +190,24 @@
       const units = document.getElementById("units").value;
 
       try {
-        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donate", {
+        const res = await fetch("https://blood-bank-management-system-p5yt.onrender.com/api/donor/donate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
+            donorEmail: user.email,
             hospital,
             location,
             bloodGroup,
-            units,
-            donorEmail: user.email
+            units
           })
         });
 
         const result = await res.json();
         document.getElementById("message").innerText = result.message || "Donation submitted!";
         document.getElementById("message").style.color = "green";
-
-        // Save last donation in localStorage
-        localStorage.setItem("lastDonation", JSON.stringify({
-          hospital, location, bloodGroup, units, date: new Date().toLocaleString()
-        }));
 
         e.target.reset();
         customHospitalInput.style.display = "none";
@@ -222,26 +217,41 @@
       }
     });
 
-    // Modal logic
+    // --- Modal logic: fetch last donation via API ---
     const modal = document.getElementById("donationModal");
     const closeModal = document.getElementById("closeModal");
     const seeLastDonation = document.getElementById("seeLastDonation");
     const lastDonationData = document.getElementById("lastDonationData");
 
-    seeLastDonation.addEventListener("click", () => {
-      const lastDonation = JSON.parse(localStorage.getItem("lastDonation"));
-      if (lastDonation) {
-        lastDonationData.innerHTML = `
-          <p><strong>Hospital:</strong> ${lastDonation.hospital}</p>
-          <p><strong>Location:</strong> ${lastDonation.location}</p>
-          <p><strong>Blood Group:</strong> ${lastDonation.bloodGroup}</p>
-          <p><strong>Units:</strong> ${lastDonation.units}</p>
-          <p><strong>Date:</strong> ${lastDonation.date}</p>
-        `;
-      } else {
-        lastDonationData.innerText = "No previous donation found.";
+    seeLastDonation.addEventListener("click", async () => {
+      try {
+        const res = await fetch(`https://blood-bank-management-system-p5yt.onrender.com/api/donor/history/${user.email}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+
+        if (data.length > 0) {
+          const lastDonation = data[0]; // since backend sorts by date -1
+          lastDonationData.innerHTML = `
+            <p><strong>Hospital:</strong> ${lastDonation.hospital}</p>
+            <p><strong>Location:</strong> ${lastDonation.location}</p>
+            <p><strong>Blood Group:</strong> ${lastDonation.bloodGroup}</p>
+            <p><strong>Units:</strong> ${lastDonation.units}</p>
+            <p><strong>Date:</strong> ${new Date(lastDonation.date).toLocaleString()}</p>
+          `;
+        } else {
+          lastDonationData.innerText = "No previous donation found.";
+        }
+        modal.style.display = "flex";
+      } catch (err) {
+        lastDonationData.innerText = "Error fetching donation history.";
+        modal.style.display = "flex";
       }
-      modal.style.display = "flex";
     });
 
     closeModal.addEventListener("click", () => {
