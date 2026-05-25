@@ -214,7 +214,7 @@ JWT_SECRET=your_super_secret_jwt_key_here
 # Server Port
 PORT=5000
 
-# CORS Origin (optional)
-FRONTEND_URL=http://localhost:3000
+# CORS Origin
+FRONTEND_URL=https://blood-bank-management-system-1-o3z8.onrender.com
 ```
 
