@@ -10,20 +10,8 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const app = express();
 
 // Middleware
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-].filter(Boolean);
-
 app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error('Not allowed by CORS'));
-  }
+  origin: true
 }));
 app.use(express.json());
 

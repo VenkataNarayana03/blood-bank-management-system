@@ -49,4 +49,21 @@ router.get('/requests', async (req, res) => {
   }
 });
 
+// GET /api/recipient/history/:email
+router.get('/history/:email', async (req, res) => {
+  const { email } = req.params;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
+  try {
+    const requests = await BloodRequest.find({ email }).sort({ date: -1 });
+    return res.json(requests);
+  } catch (err) {
+    console.error("❌ Error fetching request history:", err.message);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

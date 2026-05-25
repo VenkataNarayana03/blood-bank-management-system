@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const response = await fetch(`https://blood-bank-management-system-h78a.onrender.com/api/recipient/history/${email}`, {
+    const response = await fetch(`https://blood-bank-management-system-h78a.onrender.com/api/recipient/requests?email=${encodeURIComponent(email)}`, {
       headers: {
         'Authorization': token
       }

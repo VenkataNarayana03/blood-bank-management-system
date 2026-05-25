@@ -87,7 +87,7 @@
       window.location.href = "../login.html";
     }
 
-    fetch(`https://blood-bank-management-system-h78a.onrender.com/api/recipient/history/${user.email}`, {
+    fetch(`https://blood-bank-management-system-h78a.onrender.com/api/recipient/requests?email=${encodeURIComponent(user.email)}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
