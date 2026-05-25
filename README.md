@@ -184,21 +184,7 @@ npx serve .
 }
 ```
 
-## Deployment
 
-### Frontend Deployment
-The frontend can be deployed on any static hosting service:
-- Netlify
-- Vercel
-- GitHub Pages
-- AWS S3
-
-### Backend Deployment
-The backend is currently configured for deployment on:
-- **Render** - Recommended for Node.js applications
-- Heroku
-- AWS EC2
-- DigitalOcean
 
 ## Environment Variables
 
